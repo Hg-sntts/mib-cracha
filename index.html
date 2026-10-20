@@ -1,5 +1,199 @@
-<html>
-  <h1>
-    Hello World!
-  </h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIB - Sistema de Monitoramento</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #00ff66;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(0, 20, 10, 0.8);
+            border: 2px solid #00ff66;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
+            text-align: center;
+            position: relative;
+        }
+
+        .header {
+            border-bottom: 1px dashed #00ff66;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #ff3333;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            color: #88ffaa;
+        }
+
+        /* Animação de Scan */
+        .scanner-box {
+            margin: 30px 0;
+        }
+
+        .radar {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #00ff66;
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: spin 3s linear infinite;
+        }
+
+        .radar-inner {
+            width: 20px;
+            height: 20px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff3333;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            color: #ffff00;
+        }
+
+        /* Resultado (escondido inicialmente) */
+        .result-box {
+            display: none;
+            text-align: left;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff3333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .result-box h2 {
+            color: #ff3333;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .result-box p {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            color: #fff;
+        }
+
+        .result-box span {
+            color: #00ff66;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.7rem;
+            color: #557766;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ MIB - CLASSIFIED</h1>
+            <p>Rede de Vigilância Planetária</p>
+        </div>
+
+        <!-- Tela de Carregamento / Scan -->
+        <div id="loading-screen" class="scanner-box">
+            <div class="radar">
+                <div class="radar-inner"></div>
+            </div>
+            <div class="status-text" id="status-msg">Iniciando varredura biológica...</div>
+        </div>
+
+        <!-- Tela de Resultado -->
+        <div id="result-screen" class="result-box">
+            <h2>ALERTA DE SEGURANÇA</h2>
+            <p><strong>Status:</strong> <span style="color: #ff3333;">NÃO-HUMANO DETECTADO</span></p>
+            <p><strong>Espécie Identificada:</strong> <span id="species">Forma de vida baseada em silício</span></p>
+            <p><strong>Nível de Ameaça:</strong> <span id="threat">Baixo (Apenas querendo beber e curtir)</span></p>
+            <p><strong>Ação MIB:</strong> <span>Mantenha a calma. O Agente de plantão está de olho. Não olhe para a luz vermelha.</span></p>
+        </div>
+
+        <div class="footer">
+            Agência MIB • Setor 4 • Uso Exclusivo
+        </div>
+    </div>
+
+    <script>
+        // Lista de espécies engraçadas aleatórias para dar variedade se mais de uma pessoa escanear
+        const especies = [
+            { spec: "Arquilian disfarçado (Fã de café)", threat: "Moderado (Pode pedir o universo em troca de troco)" },
+            { spec: "Squirrellian da Galáxia X-49", threat: "Baixo (Apenas buscando petiscos)" },
+            { spec: "Cafetão de Andrômeda", threat: "Inofensivo (Gosta de música alta)" },
+            { spec: "Humano Comum (Com leves traços de ressaca)", threat: "Nenhum" },
+            { spec: "Refugiado de Zeltor", threat: "Baixo (Tentando entender o que é o Pix)" }
+        ];
+
+        // Sorteia uma espécie aleatória
+        const escolhida = especies[Math.floor(Math.random() * especies.length)];
+        document.getElementById("species").innerText = escolhida.spec;
+        document.getElementById("threat").innerText = escolhida.threat;
+
+        // Simula o tempo de "scan" do celular da pessoa
+        const mensagens = [
+            "Iniciando varredura biológica...",
+            "Analisando DNA através da tela...",
+            "Cruzando dados com o banco intergaláctico...",
+            "Identidade confirmada!"
+        ];
+
+        let msgIndex = 0;
+        const msgElement = document.getElementById("status-msg");
+
+        const interval = setInterval(() => {
+            msgIndex++;
+            if (msgIndex < mensagens.length) {
+                msgElement.innerText = mensagens[msgIndex];
+            } else {
+                clearInterval(interval);
+                // Esconde o radar e mostra o resultado
+                document.getElementById("loading-screen").style.display = "none";
+                document.getElementById("result-screen").style.display = "block";
+            }
+        }, 900); // Muda de texto a cada 0.9 segundos
+    </script>
+</body>
 </html>
